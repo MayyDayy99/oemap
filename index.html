@@ -358,7 +358,7 @@ button{cursor:pointer;background:none;border:0}
   .field{padding:13px 14px;border-radius:13px}
   .field input{font-size:16px}          /* iOS: nincs auto-zoom */
   .field kbd{display:none}
-  .scroll{touch-action:pan-y}
+  .scroll{touch-action:pan-y;padding-bottom:var(--sheetpad,0px)}
 
   .res-item{padding:13px 15px;gap:13px;min-height:58px}
   .res-code{font-size:12.5px}
@@ -1202,6 +1202,7 @@ function setSnap(n){
   const prev=snap; snap=n;
   const sp=snaps();
   side.style.setProperty("--sheet",sp[n]+"px");
+  side.style.setProperty("--sheetpad",sp[n]+"px");
   document.documentElement.style.setProperty("--railb",
     (n==="peek"?142:Math.round(innerHeight*.46)+16)+"px");
   if(prev===n) return;
