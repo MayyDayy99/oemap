@@ -10,11 +10,32 @@ fájl — nincs build lépés, nincs függőség, nincs csomagkezelő.
 | Fájl | Szerep |
 | --- | --- |
 | `index.html` | Maga az alkalmazás (HTML + CSS + JS egy fájlban) |
+| `fonts/` | Saját kiszolgálású betűtípusok + licencek |
 | `.github/workflows/deploy-pages.yml` | Automatikus deploy GitHub Pages-re |
 | `.nojekyll` | Kikapcsolja a Jekyll feldolgozást |
 
-Az egyetlen külső hivatkozás a Google Fonts (IBM Plex család). Minden más — a
-teremadatok, az alaprajz geometriája, az útvonalkeresés — a fájlon belül van.
+**Nincs külső hivatkozás.** A betűtípusok a `fonts/` mappából jönnek, minden más
+— a teremadatok, az alaprajz geometriája, az útvonalkeresés — az `index.html`-en
+belül van. Így az oldal külső szolgáltató nélkül, offline is működik.
+
+## Arculat
+
+Az Óbudai Egyetem Brand Guide 2026 / 1.0 szerint:
+
+| | |
+| --- | --- |
+| Elsődleges szín | `#00288C` (sötét téma: `#799AEC`, a brand kék világosított változata) |
+| Cím / rövid szöveg | **Metropolis** (400/600/700) |
+| Folyó szöveg | **Open Sans** (400/600) |
+| Teremkódok | IBM Plex Mono — a `0`/`O` megkülönböztetése tájékozódásnál funkcionális |
+
+Az útvonal narancs marad: tájékozódási szín, nem arculati elem, és a kézikönyv
+másodlagos színei közül egyik sem ad elég kontrasztot a világos alaprajzon.
+A helyiség-kategóriák színei szintén változatlanok — azok a jelmagyarázathoz
+tartoznak, nem a márkamegjelenéshez.
+
+A betűtípusok szabadon terjeszthetők (Metropolis: public domain, Open Sans és
+IBM Plex Mono: SIL Open Font License); a licencfájlok a `fonts/` mappában vannak.
 
 ## Deploy
 
@@ -65,4 +86,5 @@ python3 -m http.server 8000
 ## Frissítés
 
 Az alkalmazás cseréjéhez írd felül az `index.html` fájlt, és pushold — a deploy
-magától lefut.
+magától lefut. Ha a fájl újragenerált változatát teszed be, ne felejtsd el a
+`fonts/` mappára mutató `@font-face` blokkot és az arculati színeket átvinni.
