@@ -1026,8 +1026,12 @@ function dive(lv){
       S.view.x=drag.vx+dx; S.view.y=drag.vy+dy;
       S.dirty=true; schedule();
     }else{
-      // ~300px vízszintes húzás ≈ negyed fordulat; a dőlés vékonyabb sávban mozog
-      S.rot.z = drag.rz + dx*0.30;
+      /* A modell az ujjat követi: a hozzánk közeli oldal arra megy, amerre húzod.
+         A világ rotateX(rx) rotateZ(rz)-t kap, egy pont képernyő-x-e cos(θ+rz),
+         ennek deriváltja rz szerint -sin(θ+rz); az elöl lévő pontnál θ+rz=90°,
+         vagyis -1 — ezért kell a rz-t csökkenteni jobbra húzáskor.
+         ~300px vízszintes húzás ≈ negyed fordulat; a dőlés vékonyabb sávban mozog. */
+      S.rot.z = drag.rz - dx*0.30;
       S.rot.x = Math.max(TILT_MIN,Math.min(TILT_MAX, drag.rx - dy*0.22));
       S.dirty=true; scheduleRot();
     }
