@@ -159,10 +159,12 @@ button{cursor:pointer;background:none;border:0}
 .legfold{display:none}
 
 /* ------------------------------------------------------------- 3D map */
-.stage{position:absolute;inset:0;perspective:2100px;perspective-origin:50% 46%}
+.stage{position:absolute;inset:0;perspective:2100px;perspective-origin:50% 46%;
+  touch-action:none;-webkit-user-select:none;user-select:none;
+  -webkit-tap-highlight-color:transparent}
 .world{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d;
   transition:transform 1s var(--ease)}
-.world.now{transition:none}
+.world.now{transition:none;will-change:transform}
 .floor{position:absolute;left:0;top:0;transform-style:preserve-3d;
   transition:transform 1s var(--ease),opacity .55s var(--ease),filter .55s var(--ease)}
 .rooms{transition:opacity .5s var(--ease)}
@@ -178,6 +180,14 @@ button{cursor:pointer;background:none;border:0}
 .lbl{font-family:"IBM Plex Mono",monospace;font-weight:600;fill:var(--ink);text-anchor:middle;letter-spacing:-.04em}
 .lbl2{font-family:"IBM Plex Sans",sans-serif;fill:var(--muted);text-anchor:middle}
 .glabel{pointer-events:none;transition:opacity .4s var(--ease)}
+
+/* Navigálás közben minden per-frame költséget kikapcsolunk: a backdrop-blur
+   újraszámolná a mozgó térképet minden képkockán, a ping animáció folyamatosan
+   piszkítja a 3D réteget, a hit-teszt pedig 700+ poligonon futna mozgatásonként. */
+.navving .rail,.navving .plate,.navving .tools button,.navving .legend-btn{backdrop-filter:none}
+.navving .ring{animation-play-state:paused}
+.navving .floor{pointer-events:none}
+.navving .room.pick:hover{opacity:1}
 
 /* módfüggő interakció */
 .m2 .floor{cursor:default}
@@ -281,6 +291,9 @@ button{cursor:pointer;background:none;border:0}
 /* ============================== MOBIL ============================== */
 @media (max-width:900px){
   body{overscroll-behavior:none}
+  /* Telefonon a backdrop-blur minden képkockán újraszámolná az alatta mozgó
+     térképet. A panelek amúgy is 92%-ban átlátszatlanok, így alig látszik. */
+  .rail,.plate,.tools button,.legend-btn{backdrop-filter:none;background:var(--surface)}
   .app{display:block;height:100dvh;position:relative}
 
   .head{position:fixed;top:0;left:0;right:0;height:54px;padding:0 12px;gap:8px;
@@ -870,14 +883,30 @@ function dive(lv){
   const stage=$("stage");
   const pts=new Map();
   let drag=null,moved=0,pinch=null;
-  const nowOn=()=>world.classList.add("now"), nowOff=()=>world.classList.remove("now");
+  const nowOn =()=>{world.classList.add("now");    app.classList.add("navving");};
+  const nowOff=()=>{world.classList.remove("now"); app.classList.remove("navving");};
   const mid=()=>{const a=[...pts.values()];
     return {x:(a[0].x+a[1].x)/2,y:(a[0].y+a[1].y)/2,
             d:Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)};};
 
+  /* A pointermove sűrűbben tüzel, mint ahány képkocka van (telefonon 120 Hz+),
+     ezért az írást egy rAF-ra fogjuk össze: képkockánként pontosan egy transform. */
+  let raf=0;
+  const paint=()=>{ raf=0; world.style.transform=worldTransform(); };
+  const schedule=()=>{ if(!raf) raf=requestAnimationFrame(paint); };
+
+  /* A rect olvasása transform-írás után kényszerített layoutot okoz. Gesztusonként
+     egyszer olvassuk ki, nem mozdulatonként. */
+  let rect=null;
+  const getRect=()=>rect||(rect=$("mapwrap").getBoundingClientRect());
+  const dropRect=()=>{rect=null;};
+  addEventListener("resize",dropRect,{passive:true});
+  addEventListener("orientationchange",dropRect);
+  addEventListener("scroll",dropRect,{passive:true});
+
   stage.addEventListener("pointerdown",e=>{
     pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
-    stage.setPointerCapture(e.pointerId); nowOn();
+    stage.setPointerCapture(e.pointerId); dropRect(); nowOn();
     if(pts.size===1){drag={x:e.clientX,y:e.clientY,vx:S.view.x,vy:S.view.y};moved=0;}
     else if(pts.size===2){const m=mid();
       pinch={d:m.d,k:S.view.k,x:S.view.x,y:S.view.y,mx:m.x,my:m.y};drag=null;}
@@ -888,21 +917,24 @@ function dive(lv){
     if(pinch&&pts.size>=2){
       const m=mid(), f=m.d/pinch.d;
       const nk=Math.max(.15,Math.min(10,pinch.k*f)), g=nk/pinch.k;
-      const r=$("mapwrap").getBoundingClientRect();
+      const r=getRect();
       const cx=pinch.mx-r.left-r.width/2, cy=pinch.my-r.top-r.height/2;
       S.view.k=nk;
       S.view.x=cx-(cx-pinch.x)*g+(m.x-pinch.mx);
       S.view.y=cy-(cy-pinch.y)*g+(m.y-pinch.my);
-      S.dirty=true; world.style.transform=worldTransform(); moved=99; return;
+      S.dirty=true; schedule(); moved=99; return;
     }
     if(!drag)return;
     moved=Math.max(moved,Math.abs(e.clientX-drag.x)+Math.abs(e.clientY-drag.y));
     S.view.x=drag.vx+(e.clientX-drag.x); S.view.y=drag.vy+(e.clientY-drag.y);
-    S.dirty=true; world.style.transform=worldTransform();
-  });
+    S.dirty=true; schedule();
+  },{passive:true});
   const end=e=>{
     pts.delete(e.pointerId);
     if(pts.size<2)pinch=null;
+    // Az utolsó pozíciót még a .now osztály alatt véglegesítjük, különben a
+    // visszakapcsoló 1s-os transition ráugrana a függőben lévő képkockára.
+    if(raf){cancelAnimationFrame(raf); paint();}
     if(pts.size===0){window.__moved=moved>6;drag=null;setTimeout(nowOff,40);}
     else if(pts.size===1){const a=[...pts.values()][0];
       drag={x:a.x,y:a.y,vx:S.view.x,vy:S.view.y};}
@@ -913,10 +945,10 @@ function dive(lv){
   $("zin").onclick=()=>zoom(1.22); $("zout").onclick=()=>zoom(1/1.22); $("zfit").onclick=fit;
   function zoom(f,cx,cy){
     const nk=Math.max(.15,Math.min(10,S.view.k*f));f=nk/S.view.k;
-    const r=$("mapwrap").getBoundingClientRect();
+    const r=getRect();
     const mx=(cx==null?r.width/2:cx-r.left)-r.width/2, my=(cy==null?r.height/2:cy-r.top)-r.height/2;
     S.view.x=mx-(mx-S.view.x)*f; S.view.y=my-(my-S.view.y)*f; S.view.k=nk;
-    S.dirty=true; world.style.transform=worldTransform();
+    S.dirty=true; schedule();
   }
 })();
 $("stage").addEventListener("click",()=>{if(window.__moved)return;
