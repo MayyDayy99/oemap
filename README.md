@@ -11,12 +11,40 @@ fájl — nincs build lépés, nincs függőség, nincs csomagkezelő.
 | --- | --- |
 | `index.html` | Maga az alkalmazás (HTML + CSS + JS egy fájlban) |
 | `fonts/` | Saját kiszolgálású betűtípusok + licencek |
+| `icons/` | Alkalmazásikonok (a Metropolisszal generálva) |
+| `manifest.webmanifest` | PWA leíró — telepíthetőség |
+| `sw.js` | Service worker — offline működés |
 | `.github/workflows/deploy-pages.yml` | Automatikus deploy GitHub Pages-re |
 | `.nojekyll` | Kikapcsolja a Jekyll feldolgozást |
 
 **Nincs külső hivatkozás.** A betűtípusok a `fonts/` mappából jönnek, minden más
 — a teremadatok, az alaprajz geometriája, az útvonalkeresés — az `index.html`-en
 belül van. Így az oldal külső szolgáltató nélkül, offline is működik.
+
+## Kezelés
+
+| | Alaprajz | Épület |
+| --- | --- | --- |
+| egy ujj / egér húzás | tolás | **forgatás** — vízszintesen a tengely körül, függőlegesen a dőlés (15°–85°) |
+| két ujj | tolás + nagyítás | tolás + nagyítás |
+| görgő | nagyítás | nagyítás |
+| Shift + húzás (egérrel) | tolás | tolás |
+| ⤢ gomb | képre igazít | képre igazít **és visszaállítja az alapállást** |
+
+Az alsó lapot a fejléc bármely pontjáról lehet húzni, és a lista tetejéről lefelé
+is. Az elengedés sebessége számít: egy határozott pöccintés a mozgás irányában
+lép a következő állásra.
+
+## Telepítés a kezdőképernyőre
+
+Az oldal telepíthető webalkalmazás. Androidon a böngésző menüjében „Alkalmazás
+telepítése", iOS-en Safari → Megosztás → „Hozzáadás a főképernyőhöz". Telepítés
+után a teljes app offline is elindul — a service worker az első betöltéskor
+elteszi a HTML-t, a betűket és az ikonokat. Az épületben, gyenge térerővel is
+működik.
+
+Frissítés: a dokumentumot hálózat-először kéri le, így egy új deploy a következő
+indításnál azonnal megérkezik; offline a gyorsítótárazott példány jön.
 
 ## Arculat
 

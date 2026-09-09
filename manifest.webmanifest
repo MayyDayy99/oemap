@@ -1,0 +1,21 @@
+{
+  "name": "OA Épület Teremkereső",
+  "short_name": "OA Térkép",
+  "description": "Teremkereső és útvonaltervező az Óbudai Egyetem OA épületéhez.",
+  "lang": "hu",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "id": "/oa-teremkereso",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#eceff4",
+  "theme_color": "#00288C",
+  "categories": ["navigation", "education", "utilities"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -4,6 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>OA Épület Teremkereső</title>
+<!-- Telepíthető webalkalmazás: a manifest és a service worker az épületben,
+     gyenge térerővel is elindítja. -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="OA Térkép">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#eceff4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#080d13" media="(prefers-color-scheme: dark)">
+<meta name="description" content="Teremkereső és útvonaltervező az Óbudai Egyetem OA épületéhez.">
+
 <!-- Saját kiszolgálású betűtípusok: nincs külső kérés, és a magyar ő/ű is megvan.
      Metropolis + Open Sans az arculati kézikönyv szerint; a monospace a
      teremkódokhoz kell, ahol a 0/O megkülönböztetése funkcionális. -->
@@ -361,7 +373,7 @@ button{cursor:pointer;background:none;border:0}
   .side.drag{transition:none}
   .grab{display:block;width:100%;padding:9px 0 5px;flex:none;touch-action:none}
   .grab span{display:block;width:42px;height:4px;border-radius:99px;background:var(--line-2);margin:0 auto}
-  .search{padding:6px 14px 12px;border-bottom:1px solid var(--line)}
+  .search{padding:6px 14px 12px;border-bottom:1px solid var(--line);touch-action:none}
   .field{padding:13px 14px;border-radius:13px}
   .field input{font-size:16px}          /* iOS: nincs auto-zoom */
   .field kbd{display:none}
@@ -527,8 +539,12 @@ const I18N={hu:{
   qwc:"Nearest toilet", qbufe:"Café", qentry:"Main entrance · lobby",
   qsub:"from %s", qsub0:"from the ground-floor lobby", legend2:"Function colours"
 }};
+/* Az izometrikus nézet szögei: rot.z a függőleges tengely körüli forgatás
+   (ezt húzza az ujj vízszintesen), rot.x a dőlés. Eddig három helyen voltak
+   beégetve; most állapot, hogy forgatni lehessen. */
+const ROT0={x:58,z:-30}, TILT_MIN=15, TILT_MAX=85;
 const S={lang:"hu",theme:"auto",mode:2,level:0,from:null,to:null,sel:null,route:null,mm:null,
-         view:{k:1,x:0,y:0},leg:false};
+         view:{k:1,x:0,y:0},rot:{...ROT0},leg:false};
 const T=()=>I18N[S.lang];
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -802,20 +818,26 @@ function buildLabels(lv){
   }
 }
 
+/* A világ rotateX(x) rotateZ(z)-t kap; ennek az inverze rotateZ(-z) rotateX(-x),
+   így a felirat a forgatás közben is a néző felé néz. */
+const tagTransform=()=>
+  `translate(-100%,-50%) rotateZ(${-S.rot.z}deg) rotateX(${-S.rot.x}deg)`;
+function orientTags(){ for(const lv of LV) FLOOR[lv].tag.style.transform=tagTransform(); }
+
 function placeTags(){
   // a 3D-forgatás visszaforgatása, hogy a felirat a néző felé nézzen
   for(const lv of LV){
     const F=FLOOR[lv];
     F.tag.style.left=(BB.x0*PXM-14)+"px";
     F.tag.style.top=(BB.cy*PXM+BB.h*.22)+"px";
-    F.tag.style.transform="translate(-100%,-50%) rotateZ(30deg) rotateX(-58deg)";
+    F.tag.style.transform=tagTransform();
   }
 }
 
 function worldTransform(){
   const v=S.view;
   const base=`translate(${v.x}px,${v.y}px) scale(${v.k})`;
-  return S.mode===3 ? `${base} rotateX(58deg) rotateZ(-30deg)` : base;
+  return S.mode===3 ? `${base} rotateX(${S.rot.x}deg) rotateZ(${S.rot.z}deg)` : base;
 }
 function updateView(){
   world.style.transform=worldTransform();
@@ -893,7 +915,7 @@ function riser(lv,p,h,upward){
 
 /* ------------------------------------------------------------------ nézet */
 function projBBox(){
-  const b=-30*Math.PI/180, a=58*Math.PI/180;
+  const b=S.rot.z*Math.PI/180, a=S.rot.x*Math.PI/180;
   const cb=Math.cos(b), sb=Math.sin(b), ca=Math.cos(a), sa=Math.sin(a);
   let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;
   const ai=LVI[S.level], three=S.mode===3;
@@ -955,9 +977,11 @@ function dive(lv){
 
   /* A pointermove sűrűbben tüzel, mint ahány képkocka van (telefonon 120 Hz+),
      ezért az írást egy rAF-ra fogjuk össze: képkockánként pontosan egy transform. */
-  let raf=0;
-  const paint=()=>{ raf=0; world.style.transform=worldTransform(); };
+  let raf=0, needTags=false;
+  const paint=()=>{ raf=0; world.style.transform=worldTransform();
+                    if(needTags){ needTags=false; orientTags(); } };
   const schedule=()=>{ if(!raf) raf=requestAnimationFrame(paint); };
+  const scheduleRot=()=>{ needTags=true; schedule(); };
 
   /* A rect olvasása transform-írás után kényszerített layoutot okoz. Gesztusonként
      egyszer olvassuk ki, nem mozdulatonként. */
@@ -971,7 +995,14 @@ function dive(lv){
   stage.addEventListener("pointerdown",e=>{
     pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
     stage.setPointerCapture(e.pointerId); dropRect(); nowOn();
-    if(pts.size===1){drag={x:e.clientX,y:e.clientY,vx:S.view.x,vy:S.view.y};moved=0;}
+    if(pts.size===1){
+      // Épület nézetben egy ujj forgat, Alaprajzon tol. Shift vagy a középső/jobb
+      // gomb egérrel forgatás helyett tolás, hogy asztali gépen is legyen pan.
+      const pan = S.mode!==3 || e.shiftKey || e.button===1 || e.button===2;
+      drag={x:e.clientX,y:e.clientY,vx:S.view.x,vy:S.view.y,
+            rz:S.rot.z,rx:S.rot.x,pan};
+      moved=0;
+    }
     else if(pts.size===2){const m=mid();
       pinch={d:m.d,k:S.view.k,x:S.view.x,y:S.view.y,mx:m.x,my:m.y};drag=null;}
   });
@@ -989,9 +1020,17 @@ function dive(lv){
       S.dirty=true; schedule(); moved=99; return;
     }
     if(!drag)return;
-    moved=Math.max(moved,Math.abs(e.clientX-drag.x)+Math.abs(e.clientY-drag.y));
-    S.view.x=drag.vx+(e.clientX-drag.x); S.view.y=drag.vy+(e.clientY-drag.y);
-    S.dirty=true; schedule();
+    const dx=e.clientX-drag.x, dy=e.clientY-drag.y;
+    moved=Math.max(moved,Math.abs(dx)+Math.abs(dy));
+    if(drag.pan){
+      S.view.x=drag.vx+dx; S.view.y=drag.vy+dy;
+      S.dirty=true; schedule();
+    }else{
+      // ~300px vízszintes húzás ≈ negyed fordulat; a dőlés vékonyabb sávban mozog
+      S.rot.z = drag.rz + dx*0.30;
+      S.rot.x = Math.max(TILT_MIN,Math.min(TILT_MAX, drag.rx - dy*0.22));
+      S.dirty=true; scheduleRot();
+    }
   },{passive:true});
   const end=e=>{
     pts.delete(e.pointerId);
@@ -1006,7 +1045,7 @@ function dive(lv){
   stage.addEventListener("pointerup",end); stage.addEventListener("pointercancel",end);
   stage.addEventListener("wheel",e=>{e.preventDefault();nowOn();
     zoom(e.deltaY<0?1.12:1/1.12,e.clientX,e.clientY);setTimeout(nowOff,60);},{passive:false});
-  $("zin").onclick=()=>zoom(1.22); $("zout").onclick=()=>zoom(1/1.22); $("zfit").onclick=fit;
+  $("zin").onclick=()=>zoom(1.22); $("zout").onclick=()=>zoom(1/1.22); $("zfit").onclick=()=>{ S.rot={...ROT0}; orientTags(); fit(); };
   function zoom(f,cx,cy){
     const nk=Math.max(.15,Math.min(10,S.view.k*f));f=nk/S.view.k;
     const r=getRect();
@@ -1240,23 +1279,62 @@ function setSnap(n){
   else { S.view.y -= (insetFor(n)-insetFor(prev))/2; updateView(); }
 }
 (function(){
-  let sd=null;
+  /* A lap húzása. Eddig csak a ~18px magas fogantyú fogadta el a mozdulatot, és
+     az elengedés a legközelebbi álláshoz ugrott a sebességtől függetlenül —
+     ettől érződött nehézkesnek. Most a teljes fejléc fog, a lista tetejéről
+     lefelé húzva is indul, és a lendület számít. */
+  const ORDER=["full","mid","peek"];        // fentről lefelé
+  const TAKE=6;                             // ennyi px után vesszük át a mozdulatot
+  const FLING=0.45;                         // px/ms — efölött lendületnek számít
+  let sd=null, samples=[], justDragged=false;
   const cur=()=>parseFloat(getComputedStyle(side).getPropertyValue("--sheet"))||0;
-  grab.addEventListener("pointerdown",e=>{
-    if(!MOB())return;
-    sd={y:e.clientY,s:cur()}; grab.setPointerCapture(e.pointerId); side.classList.add("drag");});
-  grab.addEventListener("pointermove",e=>{
-    if(!sd)return;
-    const v=Math.max(-20,Math.min(snaps().peek+70,sd.s+(e.clientY-sd.y)));
-    side.style.setProperty("--sheet",v+"px");});
-  const up=()=>{
-    if(!sd)return;
-    const v=cur(); sd=null; side.classList.remove("drag");
-    const sp=snaps(); let best="peek",bd=1e9;
-    for(const k in sp){const d=Math.abs(sp[k]-v); if(d<bd){bd=d;best=k;}}
-    setSnap(best);};
-  grab.addEventListener("pointerup",up); grab.addEventListener("pointercancel",up);
-  grab.addEventListener("click",()=>{ if(sd)return;
+
+  const begin=(y,fromScroll)=>{
+    if(!MOB()) return;
+    sd={y0:y,s:cur(),fromScroll,active:false};
+    samples=[{t:performance.now(),y}];
+  };
+  const move=y=>{
+    if(!sd) return;
+    const dy=y-sd.y0;
+    if(!sd.active){
+      if(Math.abs(dy)<TAKE) return;              // koppintás még átmehet
+      if(sd.fromScroll&&dy<0){ sd=null; return; } // felfelé a lista görgessen
+      sd.active=true; side.classList.add("drag");
+    }
+    const sp=snaps();
+    side.style.setProperty("--sheet",
+      Math.max(-24,Math.min(sp.peek+80,sd.s+dy))+"px");
+    samples.push({t:performance.now(),y});
+    if(samples.length>6) samples.shift();
+  };
+  const finish=()=>{
+    if(!sd) return;
+    const was=sd.active; sd=null;
+    if(!was) return;
+    justDragged=true; setTimeout(()=>{justDragged=false;},0);
+    side.classList.remove("drag");
+    const v=cur(), sp=snaps();
+    const a=samples[0], b=samples[samples.length-1];
+    const vy=(a&&b&&b.t>a.t) ? (b.y-a.y)/(b.t-a.t) : 0;   // + = lefelé
+    let near=0, nd=1e9;
+    ORDER.forEach((k,i)=>{const d=Math.abs(sp[k]-v); if(d<nd){nd=d;near=i;}});
+    const idx = Math.abs(vy)>FLING
+      ? Math.max(0,Math.min(ORDER.length-1, near+(vy>0?1:-1)))  // lendület iránya
+      : near;
+    setSnap(ORDER[idx]);
+  };
+
+  grab.addEventListener("pointerdown",e=>begin(e.clientY,false));
+  side.querySelector(".search").addEventListener("pointerdown",e=>begin(e.clientY,false));
+  $("scroll").addEventListener("pointerdown",e=>{
+    // A lista tetejéről lefelé húzva a lapot mozgatjuk. Mivel a lista már nem
+    // tud feljebb görögni, nem kell elvenni a böngészőtől a gesztust.
+    if($("scroll").scrollTop<=0) begin(e.clientY,true);
+  });
+  addEventListener("pointermove",e=>move(e.clientY),{passive:true});
+  addEventListener("pointerup",finish); addEventListener("pointercancel",finish);
+  grab.addEventListener("click",()=>{ if(justDragged)return;
     setSnap(snap==="peek"?"mid":snap==="mid"?"full":"peek"); });
 })();
 $("q").addEventListener("focus",()=>setSnap("full"));
@@ -1278,6 +1356,9 @@ S.sel  = S.to;
 applyLang(); fit(); recompute(); refreshSel(); syncFlat();
 setSnap(MOB()?"peek":"full");
 addEventListener("orientationchange",()=>setTimeout(()=>{setSnap(snap);fit();},260));
+if("serviceWorker" in navigator)
+  addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+
 if(matchMedia("(prefers-reduced-motion: reduce)").matches) setMode(3);
 else setTimeout(()=>{ if(S.mode===2) setMode(3); }, 480);
 </script>
