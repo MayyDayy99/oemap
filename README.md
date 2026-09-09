@@ -62,12 +62,6 @@ a **Settings → Pages** oldalon is megjelenik.
 > github-pages → Deployment branches** alatt engedélyezd az ágat, amelyikről
 > deployolsz.
 
-## Ágak
-
-A repó alapértelmezett ága jelenleg `claude/blissful-goodall-royl5x`, mert egy
-üres repóba ez került fel elsőként. Ha átnevezed `main`-re, a deploy attól még
-működik — a workflow a `main`, a `master` és ez az ág mindegyikére fut.
-
 ## Helyi futtatás
 
 Elég megnyitni a fájlt a böngészőben:

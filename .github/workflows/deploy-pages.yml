@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main
-      - master
-      - claude/blissful-goodall-royl5x
   workflow_dispatch:
 
 # A GITHUB_TOKEN jogosultságai a Pages-re történő deployhoz.
