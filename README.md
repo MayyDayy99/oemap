@@ -22,15 +22,12 @@ A `deploy-pages.yml` workflow minden pusholásnál lefut, és a repó tartalmát
 kirakja GitHub Pages-re. Kézzel is indítható: **Actions → Deploy to GitHub Pages
 → Run workflow**.
 
-### Egyszeri beállítás
+### Beállítás
 
-A workflow csak akkor tud publikálni, ha a Pages forrása a GitHub Actions:
-
-1. **Settings → Pages**
-2. **Build and deployment → Source:** válaszd a **GitHub Actions** opciót
-
-Ezután az első push (vagy kézi indítás) már élesíti az oldalt. Az URL az Actions
-futás összegzésében és a **Settings → Pages** oldalon is megjelenik.
+Nincs teendő. A `configure-pages` lépés `enablement: true` beállítással fut, így
+az első futáskor magától bekapcsolja a Pages-t, és a forrást GitHub Actions-re
+állítja. Az élő URL az Actions futás összegzésében és a **Settings → Pages**
+oldalon is megjelenik.
 
 > Ha a deploy `Branch not allowed to deploy` hibával áll meg, akkor a
 > `github-pages` environment ághoz van kötve: **Settings → Environments →
