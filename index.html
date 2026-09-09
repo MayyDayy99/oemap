@@ -535,7 +535,16 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
 
 /* ------------------------------------------------------------------ adat */
 const MOB=()=>matchMedia("(max-width:900px)").matches;
-const PXM=10, GAP=MOB()?84:118;
+/* Az Épület nézet valódi 3D transzformokat használ, ezért a böngésző textúrába
+   rajzolja a szinteket, és a nagyítás azt a bitmapet nyújtja fel — ettől lesz
+   homályos, ahogy ráközelítesz. Sűrűbb SVG-vel sűrűbb a textúra is. A költség a
+   pixelszámmal négyzetesen nő, ezért csak ott emelünk, ahol van rá tartalék:
+   telefonon soha, és nagy pixelarányú kijelzőn sem, mert ott a böngésző már
+   magától sűrűbben raszterizál. Minden méret a PXM-ből származik (PW/PH, BB,
+   OFFX/OFFY, és a fit() is abból számol), így a megjelenés önmagát korrigálja —
+   csak a szintek távolságát kell vele együtt skálázni. */
+const SS = MOB() ? 1 : Math.min(2, Math.max(1, Math.ceil(2/(devicePixelRatio||1))));
+const PXM=10*SS, GAP=(MOB()?84:118)*SS;
 const LV=D.levels.map(l=>l.level), LVI=Object.fromEntries(LV.map((l,i)=>[l,i]));
 const GW=D.grid.w, GH=D.grid.h, RES=D.grid.res, CELLS=GW*GH;
 const PW=D.meta.w*PXM, PH=D.meta.h*PXM;
