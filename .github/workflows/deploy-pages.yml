@@ -29,12 +29,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
+      # A Pages-t egyszer kézzel kell bekapcsolni (Settings → Pages →
+      # Source: GitHub Actions). A GITHUB_TOKEN deployolni tud, létrehozni a
+      # Pages site-ot nem — ahhoz repo admin jog kell, lásd a README-t.
       - name: Setup Pages
         uses: actions/configure-pages@v5
-        with:
-          # Bekapcsolja a Pages-t a repóban, ha még nincs — így nem kell
-          # kézzel beállítani a Settings → Pages oldalon.
-          enablement: true
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
