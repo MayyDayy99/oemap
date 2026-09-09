@@ -218,6 +218,13 @@ button{cursor:pointer;background:none;border:0}
 /* Navigálás közben minden per-frame költséget kikapcsolunk: a backdrop-blur
    újraszámolná a mozgó térképet minden képkockán, a ping animáció folyamatosan
    piszkítja a 3D réteget, a hit-teszt pedig 700+ poligonon futna mozgatásonként. */
+/* Alaprajz nézetben nincs egyetlen 3D transzform sem, a perspective és a
+   preserve-3d viszont így is külön réteget tart fenn minden szintnek, és
+   kizárja a lapos gyorsútvonalat. A .flat2d csak a szintanimáció lefutása
+   után kerül fel, hogy a translateZ visszaút ne ugorjon. */
+.flat2d .stage{perspective:none}
+.flat2d .world,.flat2d .floor{transform-style:flat}
+
 .navving .rail,.navving .plate,.navving .tools button,.navving .legend-btn{backdrop-filter:none}
 .navving .ring{animation-play-state:paused}
 .navving .floor{pointer-events:none}
@@ -720,19 +727,19 @@ function buildFloors(){
     const rs=D.rooms.filter(r=>r.level===L.level);
     const wallPath=(D.walls[String(L.level)]||[]).map(w=>"M"+w.map(p=>p.join(" ")).join("L")+"Z").join("");
 
+    // A sziluett, az árnyék és a kattintófelület ugyanazt a három réteget rajzolta
+    // ki helyiségenként külön poligonnal. Mindhárom egyetlen összefüggő alakzat,
+    // ezért egy-egy path alútvonalaiként megy ki: helyiségenként 3 csomópont
+    // helyett összesen 3. Az árnyéknál ez a féligáteresztő kitöltés átfedéseinél
+    // keletkező sötétebb foltokat is megszünteti.
+    const slabD = rs.map(r=>"M"+r.poly.map(p=>p.join(" ")).join("L")+"Z").join("");
+
     // 1. födém-sziluett (helyiségek + falak összeolvasztva) + vetett árnyék
-    const sh=el("g",{class:"slabsh",transform:"translate(0.7 2)"});
-    for(const r of rs) sh.appendChild(el("polygon",{points:r.poly.map(p=>p.join(",")).join(" ")}));
-    svg.appendChild(sh);
-    const slab=el("g",{class:"slab"});
-    for(const r of rs) slab.appendChild(el("polygon",{points:r.poly.map(p=>p.join(",")).join(" ")}));
-    if(wallPath) slab.appendChild(el("path",{d:wallPath}));
-    svg.appendChild(slab);
+    svg.appendChild(el("path",{class:"slabsh",transform:"translate(0.7 2)",d:slabD||"M0 0"}));
+    svg.appendChild(el("path",{class:"slab",d:(slabD+wallPath)||"M0 0"}));
 
     // 2. kattintófelület (3D módban)
-    const hit=el("g",{class:"hit",fill:"transparent"});
-    for(const r of rs) hit.appendChild(el("polygon",{points:r.poly.map(p=>p.join(",")).join(" ")}));
-    if(wallPath) hit.appendChild(el("path",{d:wallPath}));
+    const hit=el("path",{class:"hit",fill:"transparent",d:(slabD+wallPath)||"M0 0"});
     hit.addEventListener("click",e=>{e.stopPropagation();dive(L.level);});
     svg.appendChild(hit);
 
@@ -814,6 +821,14 @@ function updateView(){
     F.rooms.style.opacity = S.mode===3 ? (on?1:0) : 1;
     F.walls.style.opacity = S.mode===3 ? (on?1:.32) : 1;
     F.box.style.pointerEvents = S.mode===3 ? "auto" : (on?"auto":"none");
+    // Alaprajz nézetben a rejtett szintek opacity:0-val is rétegben maradnak.
+    // A .55s-os áttűnés után visibility:hidden kiveszi őket a festésből és a
+    // hit-tesztből; a késleltetés miatt a szintváltás áttűnése megmarad.
+    clearTimeout(F.hideT);
+    if(S.mode===3 || on) F.box.style.visibility="";
+    else F.hideT=setTimeout(()=>{
+      if(S.mode!==3 && lv!==S.level) F.box.style.visibility="hidden";
+    },600);
     F.box.style.zIndex = 100+F.idx;
     if(on && S.mode===2) buildLabels(lv);
     F.labels.style.opacity = S.mode===3 ? 0 : 1;
@@ -902,12 +917,18 @@ function fit(){
   S.dirty=false;
   updateView();
 }
+let flatT=0;
+function syncFlat(){
+  clearTimeout(flatT);
+  if(S.mode===3){ app.classList.remove("flat2d"); return; }
+  flatT=setTimeout(()=>{ if(S.mode===2) app.classList.add("flat2d"); },1050);
+}
 function setMode(m){
   if(S.mode===m)return;
   S.mode=m;
   app.classList.toggle("m3",m===3); app.classList.toggle("m2",m===2);
   $("m2").setAttribute("aria-pressed",m===2); $("m3").setAttribute("aria-pressed",m===3);
-  fit();
+  fit(); syncFlat();
 }
 function dive(lv){
   S.level=lv; renderRail();
@@ -1245,7 +1266,7 @@ S.level=0;
 S.from = ROOM["OA00FK1"] ? "OA00FK1" : D.rooms.find(r=>r.circ&&r.level===0).code;
 S.to   = ROOM["OA10E18"] ? "OA10E18" : null;
 S.sel  = S.to;
-applyLang(); fit(); recompute(); refreshSel();
+applyLang(); fit(); recompute(); refreshSel(); syncFlat();
 setSnap(MOB()?"peek":"full");
 addEventListener("orientationchange",()=>setTimeout(()=>{setSnap(snap);fit();},260));
 if(matchMedia("(prefers-reduced-motion: reduce)").matches) setMode(3);
