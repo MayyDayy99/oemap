@@ -977,6 +977,12 @@ function dive(lv){
 
   /* A pointermove sűrűbben tüzel, mint ahány képkocka van (telefonon 120 Hz+),
      ezért az írást egy rAF-ra fogjuk össze: képkockánként pontosan egy transform. */
+  /* A drag objektum egyetlen helyen épül. Korábban a pointerdown és az ujjak
+     fogyásakor külön-külön készült, és az utóbbiból kimaradt a pan/rz/rx —
+     így a rotálóág undefined-ből számolt, S.rot NaN lett, a transzformot a
+     böngésző eldobta, és a térkép megfagyott. */
+  const startDrag=(x,y,pan)=>({x,y,vx:S.view.x,vy:S.view.y,rz:S.rot.z,rx:S.rot.x,pan});
+
   let raf=0, needTags=false;
   const paint=()=>{ raf=0; world.style.transform=worldTransform();
                     if(needTags){ needTags=false; orientTags(); } };
@@ -998,9 +1004,8 @@ function dive(lv){
     if(pts.size===1){
       // Épület nézetben egy ujj forgat, Alaprajzon tol. Shift vagy a középső/jobb
       // gomb egérrel forgatás helyett tolás, hogy asztali gépen is legyen pan.
-      const pan = S.mode!==3 || e.shiftKey || e.button===1 || e.button===2;
-      drag={x:e.clientX,y:e.clientY,vx:S.view.x,vy:S.view.y,
-            rz:S.rot.z,rx:S.rot.x,pan};
+      drag=startDrag(e.clientX,e.clientY,
+        S.mode!==3 || e.shiftKey || e.button===1 || e.button===2);
       moved=0;
     }
     else if(pts.size===2){const m=mid();
@@ -1031,8 +1036,10 @@ function dive(lv){
          ennek deriváltja rz szerint -sin(θ+rz); az elöl lévő pontnál θ+rz=90°,
          vagyis -1 — ezért kell a rz-t csökkenteni jobbra húzáskor.
          ~300px vízszintes húzás ≈ negyed fordulat; a dőlés vékonyabb sávban mozog. */
-      S.rot.z = drag.rz - dx*0.30;
-      S.rot.x = Math.max(TILT_MIN,Math.min(TILT_MAX, drag.rx - dy*0.22));
+      const nz = drag.rz - dx*0.30;
+      const nx = Math.max(TILT_MIN,Math.min(TILT_MAX, drag.rx - dy*0.22));
+      if(!Number.isFinite(nz)||!Number.isFinite(nx)) return;   // sose ragadjon be
+      S.rot.z = nz; S.rot.x = nx;
       S.dirty=true; scheduleRot();
     }
   },{passive:true});
@@ -1043,8 +1050,12 @@ function dive(lv){
     // visszakapcsoló 1s-os transition ráugrana a függőben lévő képkockára.
     if(raf){cancelAnimationFrame(raf); paint();}
     if(pts.size===0){window.__moved=moved>6;drag=null;setTimeout(nowOff,40);}
-    else if(pts.size===1){const a=[...pts.values()][0];
-      drag={x:a.x,y:a.y,vx:S.view.x,vy:S.view.y};}
+    else if(pts.size===1){
+      /* A csippentésből egy ujjra fogyva tolunk tovább: a gesztus két ujjal
+         indult, hirtelen forgatásba váltani meglepő lenne. */
+      const a=[...pts.values()][0];
+      drag=startDrag(a.x,a.y,true);
+    }
   };
   stage.addEventListener("pointerup",end); stage.addEventListener("pointercancel",end);
   stage.addEventListener("wheel",e=>{e.preventDefault();nowOn();
