@@ -14,6 +14,8 @@ fájl — nincs build lépés, nincs függőség, nincs csomagkezelő.
 | `icons/` | Alkalmazásikonok (a Metropolisszal generálva) |
 | `manifest.webmanifest` | PWA leíró — telepíthetőség |
 | `sw.js` | Service worker — offline működés |
+| `data/` | Foglalható termek és foglaltságuk (generált) |
+| `tools/` | Az adatot előállító szkriptek |
 | `.github/workflows/deploy-pages.yml` | Automatikus deploy GitHub Pages-re |
 | `.nojekyll` | Kikapcsolja a Jekyll feldolgozást |
 
@@ -45,6 +47,36 @@ működik.
 
 Frissítés: a dokumentumot hálózat-először kéri le, így egy új deploy a következő
 indításnál azonnal megérkezik; offline a gyorsítótárazott példány jön.
+
+## Foglalható termek
+
+A kereső alatti gyorsgombok közt a **Foglalható termek** megmutatja, melyik terem
+szabad vagy foglalt éppen, kinyitva pedig a napi sávokat és a felszereltséget.
+
+Az adat két forrásból áll össze, a hivatalos teremnéven:
+
+| forrás | mit ad | feldolgozó |
+| --- | --- | --- |
+| `ingatlan.uni-obuda.hu/termek` mentett lapjai | név, férőhely, felszereltség | `tools/parse-rooms.py` |
+| teremfoglalási tábla (`terem.xlsx`) | napi/óránkénti foglaltság, kar, típus | `tools/parse-timetable.py` |
+
+```
+python3 tools/parse-rooms.py mentett*.htm > data/rooms.json
+python3 tools/parse-timetable.py terem.xlsx /tmp/tt.json
+python3 tools/build-termek.py data/rooms.json /tmp/tt.json data/termek.json 2026-08-31
+```
+
+A `build-termek.py` utolsó paramétere a kezdődátum — enélkül az egész
+munkafüzet bekerülne (919 KB); egy-két héttel 6 KB.
+
+**Az adat lejár.** A `termek.json` `from`/`to` mezői mondják meg, meddig érvényes;
+azon kívüli napra az app „nincs adat"-ot ír, nem „szabad"-ot. Új tábla érkezésekor
+a fenti három parancs újrafuttatandó.
+
+**Ezek nem az alaprajz kódjai.** Az `F01…F09` és az `Audmax` az egyetem hivatalos
+teremnevei; a tervlap más (üzemeltetési) számozást használ, és a kettő
+összerendelése még nincs meg. Például a hivatalos `F01` 268 fős, míg a tervlap
+`OA00F01`-e 95,7 m². Ezért a foglalható termek nem jelennek meg a térképen.
 
 ## Arculat
 

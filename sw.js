@@ -1,8 +1,8 @@
 /* Az app teljesen önálló: egy HTML, a betűk és az ikonok. Ezeket telepítéskor
    eltesszük, így az épületben gyenge térerővel is elindul. */
-const CACHE = "oemap-v1";
+const CACHE = "oemap-v2";
 const SHELL = [
-  "./", "./index.html", "./manifest.webmanifest",
+  "./", "./index.html", "./manifest.webmanifest", "./data/termek.json",
   "./icons/icon-192.png", "./icons/icon-512.png",
   "./icons/icon-maskable-192.png", "./icons/icon-maskable-512.png",
   "./fonts/metropolis-latin-400-normal.woff2",

@@ -48,7 +48,11 @@ def parse_sheet(ws):
             continue                      # nem az F-blokk fejléce
 
         date = ws.cell(r, 3).value
-        date = date.date() if isinstance(date, datetime.datetime) else date
+        if isinstance(date, datetime.datetime):
+            date = date.date()
+        if not isinstance(date, datetime.date):
+            continue          # elrontott fejléc dátum nélkül — ilyen egy van
+
         cols = {c: str(ws.cell(r, c).value).strip()
                 for c in range(4, 20) if ws.cell(r, c).value not in (None, "")}
         # a fejléc fölötti sor a férőhely
@@ -78,13 +82,15 @@ def parse_sheet(ws):
     return out, caps
 
 
-def main(src, dst):
+def main(src, dst, since=None):
     wb = openpyxl.load_workbook(src, data_only=True)
     rows, caps = [], {}
     for ws in wb.worksheets:
         r, c = parse_sheet(ws)
         rows += r
         caps.update(c)
+    if since:
+        rows = [r for r in rows if r["date"] >= since]
     rooms = sorted({r["room"] for r in rows})
     weeks = sorted({r["date"] for r in rows})
     data = {
@@ -105,4 +111,5 @@ def main(src, dst):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1], sys.argv[2])
+    # 3. argumentum: ettől a naptól (ISO), pl. 2026-08-31 — enélkül az egész
+    main(sys.argv[1], sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else None)
