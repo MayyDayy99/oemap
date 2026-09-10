@@ -1,0 +1,812 @@
+[
+ {
+  "nev": "1.116",
+  "ferohely": 24,
+  "slug": "1116",
+  "url": "https://ingatlan.uni-obuda.hu/terem/1116",
+  "felszereltseg": [
+   "PC",
+   "beépített projektor",
+   "krétatábla",
+   "mozgatható berendezés",
+   "wifi"
+  ]
+ },
+ {
+  "nev": "2.207",
+  "ferohely": 120,
+  "slug": "2207",
+  "url": "https://ingatlan.uni-obuda.hu/terem/2207",
+  "felszereltseg": [
+   "PC",
+   "SMART TV",
+   "beépített projektor",
+   "krétatábla",
+   "mozgatható berendezés",
+   "mozgatható székek és asztalok",
+   "vetítővászon",
+   "wifi"
+  ]
+ },
+ {
+  "nev": "2.215",
+  "ferohely": 46,
+  "slug": "2215",
+  "url": "https://ingatlan.uni-obuda.hu/terem/2215",
+  "felszereltseg": [
+   "PC",
+   "beépített projektor",
+   "mozgatható berendezés",
+   "vetítővászon",
+   "whiteboard",
+   "wifi"
+  ]
+ },
+ {
+  "nev": "2.218",
+  "ferohely": 22,
+  "slug": "2218",
+  "url": "https://ingatlan.uni-obuda.hu/terem/2218",
+  "felszereltseg": [
+   "PC",
+   "beépített projektor",
+   "mozgatható berendezés",
+   "whiteboard",
+   "wifi"
+  ]
+ },
+ {
+  "nev": "4.401",
+  "ferohely": 200,
+  "slug": "4401",
+  "url": "https://ingatlan.uni-obuda.hu/terem/4401",
+  "felszereltseg": [
+   "A/C",
+   "beépített laptop",
+   "beépített projektor",
+   "csiptetős mikrofonok",
+   "elnöki asztal",
+   "hangosítás",
+   "hordozható botmikrofon",
+   "wifi"
+  ]
+ },
+ {
+  "nev": "4.402",
+  "ferohely": 336,
+  "slug": "4402",
+  "url": "https://ingatlan.uni-obuda.hu/terem/4402",
+  "felszereltseg": [
+   "A/C",
+   "beépített laptop",
+   "beépített projektor",
+   "csiptetős mikrofonok",
+   "elnöki asztal",
+   "hangosítás",
+   "hordozható botmikrofon",
+   "whiteboard",
+   "wifi"
+  ]
+ },
+ {
+  "nev": "Audmax",
+  "ferohely": 330,
+  "slug": "audmax",
+  "url": "https://ingatlan.uni-obuda.hu/terem/audmax",
+  "felszereltseg": [
+   "A/C",
+   "asztali mikrofonok",
+   "beépített projektor",
+   "csiptetős mikrofonok",
+   "elnöki asztal",
+   "hangosítás",
+   "konnektor hálózat az ülőhelyeknél",
+   "krétatábla",
+   "kézi mikrofon",
+   "pulpitus",
+   "whiteboard",
+   "wifi"
+  ]
+ },
+ {
+  "nev": "Aula",
+  "ferohely": 200,
+  "slug": "aula",
+  "url": "https://ingatlan.uni-obuda.hu/terem/aula",
+  "felszereltseg": [
+   "mozgatható berendezés",
+   "mozgatható székekkel és asztalokkal"
+  ]
+ },
+ {
+  "nev": "C006",
+  "ferohely": 40,
+  "slug": "c006",
+  "url": "https://ingatlan.uni-obuda.hu/terem/c006",
+  "felszereltseg": [
+   "Vezetékes internet",
+   "előadói PC",
+   "előadói asztal",
+   "hangosítás",
+   "mozgatható berendezés",
+   "projektor",
+   "pulpitus",
+   "vetítővászon",
+   "whiteboard",
+   "wifi"
+  ]
+ },
+ {
+  "nev": "C015",
+  "ferohely": 154,
+  "slug": "c015",
+  "url": "https://ingatlan.uni-obuda.hu/terem/c015",
+  "felszereltseg": [
+   "Vezetékes internet",
+   "asztali mikrofonok",
+   "előadói PC",
+   "hangosítás",
+   "rögzített berendezés",
+   "vetítővászon",
+   "whiteboard",
+   "wifi"
+  ]
+ },
+ {
+  "nev": "C114",
+  "ferohely": 40,
+  "slug": "c114",
+  "url": "https://ingatlan.uni-obuda.hu/terem/c114",
+  "felszereltseg": [
+   "Vezetékes internet",
+   "előadói PC",
+   "mozgatható berendezés",
+   "projektor",
+   "vetítővászon",
+   "whiteboard",
+   "wifi"
+  ]
+ },
+ {
+  "nev": "C115",
+  "ferohely": 80,
+  "slug": "c115",
+  "url": "https://ingatlan.uni-obuda.hu/terem/c115",
+  "felszereltseg": [
+   "Vezetékes internet",
+   "előadói PC",
+   "projektor",
+   "rögzített berendezés",
+   "vetítővászon",
+   "whiteboard",
+   "wifi"
+  ]
+ },
+ {
+  "nev": "C201",
+  "ferohely": 37,
+  "slug": "c201",
+  "url": "https://ingatlan.uni-obuda.hu/terem/c201",
+  "felszereltseg": [
+   "asztali mikrofonok",
+   "projektor",
+   "vetítővászon",
+   "whiteboard"
+  ]
+ },
+ {
+  "nev": "C202",
+  "ferohely": 37,
+  "slug": "c202",
+  "url": "https://ingatlan.uni-obuda.hu/terem/c202",
+  "felszereltseg": [
+   "Asztali PC-k",
+   "projektor",
+   "vetítővászon",
+   "whiteboard"
+  ]
+ },
+ {
+  "nev": "C209",
+  "ferohely": 21,
+  "slug": "c209",
+  "url": "https://ingatlan.uni-obuda.hu/terem/c209",
+  "felszereltseg": [
+   "Vezetékes internet",
+   "előadói PC",
+   "mozgatható berendezés",
+   "projektor",
+   "vetítővászon",
+   "whiteboard",
+   "wifi"
+  ]
+ },
+ {
+  "nev": "C211",
+  "ferohely": 80,
+  "slug": "c211",
+  "url": "https://ingatlan.uni-obuda.hu/terem/c211",
+  "felszereltseg": [
+   "Vezetékes internet",
+   "asztali mikrofonok",
+   "előadói PC",
+   "hangosítás",
+   "projektor",
+   "rögzített berendezés",
+   "vetítővászon",
+   "whiteboard",
+   "wifi"
+  ]
+ },
+ {
+  "nev": "F01",
+  "ferohely": 268,
+  "slug": "f01",
+  "url": "https://ingatlan.uni-obuda.hu/terem/f01",
+  "felszereltseg": [
+   "A/C",
+   "beépített projektor",
+   "elnöki asztal",
+   "hangosítás",
+   "krétatábla",
+   "kézi mikrofon",
+   "pulpitus",
+   "vetítővászon",
+   "wifi"
+  ]
+ },
+ {
+  "nev": "F02",
+  "ferohely": 40,
+  "slug": "f02",
+  "url": "https://ingatlan.uni-obuda.hu/terem/f02",
+  "felszereltseg": [
+   "A/C",
+   "beépített projektor",
+   "előadói asztal",
+   "krétatábla",
+   "vetítővászon",
+   "wifi"
+  ]
+ },
+ {
+  "nev": "F03 - F04 - F07",
+  "ferohely": 45,
+  "slug": "f03-f04-f07",
+  "url": "https://ingatlan.uni-obuda.hu/terem/f03-f04-f07",
+  "felszereltseg": [
+   "A/C",
+   "beépített projektor",
+   "előadói asztal",
+   "krétatábla",
+   "vetítővászon",
+   "wifi"
+  ]
+ },
+ {
+  "nev": "F05",
+  "ferohely": 105,
+  "slug": "f05",
+  "url": "https://ingatlan.uni-obuda.hu/terem/f05",
+  "felszereltseg": [
+   "A/C",
+   "beépített projektor",
+   "elnöki asztal",
+   "hangosítás",
+   "krétatábla",
+   "kézi mikrofon",
+   "pulpitus",
+   "vetítővászon",
+   "wifi"
+  ]
+ },
+ {
+  "nev": "F06",
+  "ferohely": 144,
+  "slug": "f06",
+  "url": "https://ingatlan.uni-obuda.hu/terem/f06",
+  "felszereltseg": [
+   "A/C",
+   "beépített projektor",
+   "elnöki asztal",
+   "hangosítás",
+   "krétatábla",
+   "kézi mikrofon",
+   "pulpitus",
+   "vetítővászon",
+   "wifi"
+  ]
+ },
+ {
+  "nev": "F08",
+  "ferohely": 84,
+  "slug": "f08",
+  "url": "https://ingatlan.uni-obuda.hu/terem/f08",
+  "felszereltseg": [
+   "A/C",
+   "beépített projektor",
+   "előadói asztal",
+   "hangosítás",
+   "krétatábla",
+   "kézi mikrofon",
+   "vetítővászon",
+   "wifi"
+  ]
+ },
+ {
+  "nev": "F17",
+  "ferohely": 352,
+  "slug": "f17",
+  "url": "https://ingatlan.uni-obuda.hu/terem/f17",
+  "felszereltseg": [
+   "A/C",
+   "beépített projektor",
+   "elnöki asztal",
+   "hangosítás",
+   "hordozható botmikrofon",
+   "kézi mikrofon",
+   "vetítővászon",
+   "whiteboard",
+   "wifi"
+  ]
+ },
+ {
+  "nev": "F18",
+  "ferohely": 195,
+  "slug": "f18",
+  "url": "https://ingatlan.uni-obuda.hu/terem/f18",
+  "felszereltseg": [
+   "A/C",
+   "beépített projektor",
+   "elnöki asztal",
+   "hangosítás",
+   "hordozható botmikrofon",
+   "kézi mikrofon",
+   "vetítővászon",
+   "whiteboard",
+   "wifi"
+  ]
+ },
+ {
+  "nev": "F19",
+  "ferohely": 150,
+  "slug": "f19",
+  "url": "https://ingatlan.uni-obuda.hu/terem/f19",
+  "felszereltseg": [
+   "A/C",
+   "beépített projektor",
+   "csiptetős mikrofonok",
+   "elnöki asztal",
+   "hangosítás",
+   "hordozható botmikrofon",
+   "kézi mikrofon",
+   "vetítővászon",
+   "whiteboard",
+   "wifi"
+  ]
+ },
+ {
+  "nev": "K22",
+  "ferohely": 38,
+  "slug": "k22",
+  "url": "https://ingatlan.uni-obuda.hu/terem/k22",
+  "felszereltseg": [
+   "mozgatható berendezés",
+   "whiteboard"
+  ]
+ },
+ {
+  "nev": "K28",
+  "ferohely": 105,
+  "slug": "k28",
+  "url": "https://ingatlan.uni-obuda.hu/terem/k28",
+  "felszereltseg": [
+   "előadói asztal",
+   "krétatábla",
+   "projektor",
+   "rögzített berendezés",
+   "whiteboard"
+  ]
+ },
+ {
+  "nev": "K38",
+  "ferohely": 40,
+  "slug": "k38",
+  "url": "https://ingatlan.uni-obuda.hu/terem/k38",
+  "felszereltseg": [
+   "előadói asztal",
+   "krétatábla",
+   "mozgatható berendezés",
+   "projektor",
+   "whiteboard"
+  ]
+ },
+ {
+  "nev": "K39",
+  "ferohely": 48,
+  "slug": "k39",
+  "url": "https://ingatlan.uni-obuda.hu/terem/k39",
+  "felszereltseg": [
+   "előadói asztal",
+   "krétatábla",
+   "projektor",
+   "rögzített berendezés",
+   "whiteboard"
+  ]
+ },
+ {
+  "nev": "K42",
+  "ferohely": 48,
+  "slug": "k42",
+  "url": "https://ingatlan.uni-obuda.hu/terem/k42",
+  "felszereltseg": [
+   "előadói asztal",
+   "krétatábla",
+   "projektor",
+   "rögzített berendezés",
+   "whiteboard"
+  ]
+ },
+ {
+  "nev": "KOLLÉGIUM 217",
+  "ferohely": 50,
+  "slug": "kollegium-217",
+  "url": "https://ingatlan.uni-obuda.hu/terem/kollegium-217",
+  "felszereltseg": [
+   "Asztali PC-k",
+   "projektor",
+   "vetítővászon"
+  ]
+ },
+ {
+  "nev": "LABOR 1.10",
+  "ferohely": 27,
+  "slug": "labor-110",
+  "url": "https://ingatlan.uni-obuda.hu/terem/labor-110",
+  "felszereltseg": [
+   "Asztali PC-k",
+   "projektor"
+  ]
+ },
+ {
+  "nev": "LABOR 1.12",
+  "ferohely": 12,
+  "slug": "labor-112",
+  "url": "https://ingatlan.uni-obuda.hu/terem/labor-112",
+  "felszereltseg": [
+   "Asztali PC-k",
+   "projektor",
+   "whiteboard"
+  ]
+ },
+ {
+  "nev": "LABOR 1.13",
+  "ferohely": 25,
+  "slug": "labor-113",
+  "url": "https://ingatlan.uni-obuda.hu/terem/labor-113",
+  "felszereltseg": [
+   "Asztali PC-k",
+   "projektor",
+   "vetítővászon",
+   "whiteboard"
+  ]
+ },
+ {
+  "nev": "LABOR 1.14",
+  "ferohely": 25,
+  "slug": "labor-114",
+  "url": "https://ingatlan.uni-obuda.hu/terem/labor-114",
+  "felszereltseg": [
+   "Asztali PC-k",
+   "projektor",
+   "vetítővászon",
+   "whiteboard"
+  ]
+ },
+ {
+  "nev": "LABOR 1.15",
+  "ferohely": 25,
+  "slug": "labor-115",
+  "url": "https://ingatlan.uni-obuda.hu/terem/labor-115",
+  "felszereltseg": [
+   "Asztali PC-k",
+   "projektor",
+   "vetítővászon",
+   "whiteboard"
+  ]
+ },
+ {
+  "nev": "LABOR 1.16",
+  "ferohely": 13,
+  "slug": "labor-116",
+  "url": "https://ingatlan.uni-obuda.hu/terem/labor-116",
+  "felszereltseg": [
+   "Asztali PC-k",
+   "projektor",
+   "vetítővászon",
+   "whiteboard"
+  ]
+ },
+ {
+  "nev": "LABOR 1.19",
+  "ferohely": 25,
+  "slug": "labor-119",
+  "url": "https://ingatlan.uni-obuda.hu/terem/labor-119",
+  "felszereltseg": [
+   "Asztali PC-k",
+   "projektor",
+   "vetítővászon",
+   "whiteboard"
+  ]
+ },
+ {
+  "nev": "LABOR 2.10",
+  "ferohely": 25,
+  "slug": "labor-210",
+  "url": "https://ingatlan.uni-obuda.hu/terem/labor-210",
+  "felszereltseg": [
+   "Asztali PC-k",
+   "projektor",
+   "vetítővászon",
+   "whiteboard"
+  ]
+ },
+ {
+  "nev": "LABOR 2.12",
+  "ferohely": 30,
+  "slug": "labor-212",
+  "url": "https://ingatlan.uni-obuda.hu/terem/labor-212",
+  "felszereltseg": [
+   "Asztali PC-k",
+   "projektor",
+   "vetítővászon",
+   "whiteboard"
+  ]
+ },
+ {
+  "nev": "LABOR 2.13",
+  "ferohely": 25,
+  "slug": "labor-213",
+  "url": "https://ingatlan.uni-obuda.hu/terem/labor-213",
+  "felszereltseg": [
+   "Asztali PC-k",
+   "Speciális felszerelés",
+   "projektor",
+   "vetítővászon"
+  ]
+ },
+ {
+  "nev": "LABOR 2.14",
+  "ferohely": 25,
+  "slug": "labor-214",
+  "url": "https://ingatlan.uni-obuda.hu/terem/labor-214",
+  "felszereltseg": [
+   "Asztali PC-k",
+   "projektor",
+   "vetítővászon",
+   "whiteboard"
+  ]
+ },
+ {
+  "nev": "LABOR 2.15",
+  "ferohely": 25,
+  "slug": "labor-215",
+  "url": "https://ingatlan.uni-obuda.hu/terem/labor-215",
+  "felszereltseg": [
+   "Asztali PC-k",
+   "projektor",
+   "vetítővászon",
+   "whiteboard"
+  ]
+ },
+ {
+  "nev": "LABOR 2.18",
+  "ferohely": 27,
+  "slug": "labor-218",
+  "url": "https://ingatlan.uni-obuda.hu/terem/labor-218",
+  "felszereltseg": [
+   "Asztali PC-k",
+   "Speciális felszerelés",
+   "projektor",
+   "vetítővászon",
+   "whiteboard"
+  ]
+ },
+ {
+  "nev": "LABOR 2.20",
+  "ferohely": 25,
+  "slug": "labor-220",
+  "url": "https://ingatlan.uni-obuda.hu/terem/labor-220",
+  "felszereltseg": [
+   "Asztali PC-k",
+   "Speciális felszerelés",
+   "projektor",
+   "vetítővászon",
+   "whiteboard"
+  ]
+ },
+ {
+  "nev": "NIK AULA",
+  "ferohely": 100,
+  "slug": "nik-aula",
+  "url": "https://ingatlan.uni-obuda.hu/terem/nik-aula",
+  "felszereltseg": [
+   "hangosítás",
+   "kézi mikrofon",
+   "közösségi helyiség",
+   "mozdítható asztalok",
+   "mozgatható berendezés",
+   "projektor",
+   "vetítővászon",
+   "wifi"
+  ]
+ },
+ {
+  "nev": "PA016",
+  "ferohely": 22,
+  "slug": "pa016",
+  "url": "https://ingatlan.uni-obuda.hu/terem/pa016",
+  "felszereltseg": [
+   "U alakú tárgyalóasztal",
+   "projektor",
+   "vetítővászon"
+  ]
+ },
+ {
+  "nev": "PA100",
+  "ferohely": 66,
+  "slug": "pa100",
+  "url": "https://ingatlan.uni-obuda.hu/terem/pa100",
+  "felszereltseg": [
+   "mozgatható berendezés",
+   "projektor",
+   "vetítővászon",
+   "whiteboard"
+  ]
+ },
+ {
+  "nev": "PA101",
+  "ferohely": 120,
+  "slug": "pa101",
+  "url": "https://ingatlan.uni-obuda.hu/terem/pa101",
+  "felszereltseg": [
+   "asztali mikrofonok",
+   "hangosítás",
+   "projektor",
+   "rögzített berendezés",
+   "vetítővászon",
+   "whiteboard"
+  ]
+ },
+ {
+  "nev": "PA102",
+  "ferohely": 48,
+  "slug": "pa102",
+  "url": "https://ingatlan.uni-obuda.hu/terem/pa102",
+  "felszereltseg": [
+   "mozgatható berendezés",
+   "projektor",
+   "vetítővászon",
+   "whiteboard"
+  ]
+ },
+ {
+  "nev": "PA103",
+  "ferohely": 60,
+  "slug": "pa103",
+  "url": "https://ingatlan.uni-obuda.hu/terem/pa103",
+  "felszereltseg": [
+   "mozgatható berendezés",
+   "projektor",
+   "vetítővászon",
+   "whiteboard"
+  ]
+ },
+ {
+  "nev": "S001",
+  "ferohely": 128,
+  "slug": "s001",
+  "url": "https://ingatlan.uni-obuda.hu/terem/s001",
+  "felszereltseg": [
+   "Vezetékes internet",
+   "asztali mikrofonok",
+   "előadói PC",
+   "hangosítás",
+   "projektor",
+   "rögzített berendezés",
+   "vetítővászon",
+   "whiteboard",
+   "wifi"
+  ]
+ },
+ {
+  "nev": "S008",
+  "ferohely": 64,
+  "slug": "s008",
+  "url": "https://ingatlan.uni-obuda.hu/terem/s008",
+  "felszereltseg": [
+   "Vezetékes internet",
+   "előadói PC",
+   "mozgatható berendezés",
+   "projektor",
+   "vetítővászon",
+   "whiteboard",
+   "wifi"
+  ]
+ },
+ {
+  "nev": "S101",
+  "ferohely": 40,
+  "slug": "s101",
+  "url": "https://ingatlan.uni-obuda.hu/terem/s101",
+  "felszereltseg": [
+   "Vezetékes internet",
+   "előadói PC",
+   "mozgatható berendezés",
+   "projektor",
+   "vetítővászon",
+   "whiteboard",
+   "wifi"
+  ]
+ },
+ {
+  "nev": "S112",
+  "ferohely": 64,
+  "slug": "s112",
+  "url": "https://ingatlan.uni-obuda.hu/terem/s112",
+  "felszereltseg": [
+   "Vezetékes internet",
+   "előadói PC",
+   "mozgatható berendezés",
+   "projektor",
+   "vetítővászon",
+   "whiteboard",
+   "wifi"
+  ]
+ },
+ {
+  "nev": "S113",
+  "ferohely": 40,
+  "slug": "s113",
+  "url": "https://ingatlan.uni-obuda.hu/terem/s113",
+  "felszereltseg": [
+   "Vezetékes internet",
+   "előadói PC",
+   "mozgatható berendezés",
+   "projektor",
+   "vetítővászon",
+   "whiteboard",
+   "wifi"
+  ]
+ },
+ {
+  "nev": "Tanterem",
+  "ferohely": 24,
+  "slug": "tanterem",
+  "url": "https://ingatlan.uni-obuda.hu/terem/tanterem",
+  "felszereltseg": [
+   "A/C",
+   "krétatábla",
+   "mozgatható berendezés",
+   "mozgatható székekkel és asztalokkal",
+   "projektor",
+   "vetítővászon",
+   "whiteboard"
+  ]
+ },
+ {
+  "nev": "Zsibongó",
+  "ferohely": 120,
+  "slug": "zsibongo",
+  "url": "https://ingatlan.uni-obuda.hu/terem/zsibongo",
+  "felszereltseg": [
+   "100-120 fős rendezvény befogadására és catering lebonyolítására is alkalmas",
+   "Asztali PC-k",
+   "közösségi helyiség",
+   "mozgatható berendezés",
+   "mozgatható székekkel és asztalokkal",
+   "színházi jellegű berendezés kialakítására is van lehetőség",
+   "wifi"
+  ]
+ }
+]
