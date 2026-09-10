@@ -175,6 +175,23 @@ button{cursor:pointer;background:none;border:0}
 .ep .x{color:var(--muted);font-size:16px;padding:0 2px;line-height:1}
 .ep .x:hover{color:var(--ink)}
 
+/* Útvonalválasztó: lépcső vagy lift. A kiválasztott az akcentszínt kapja. */
+.eyebrow.sub{margin:14px 0 7px}
+.viasw{display:flex;gap:7px}
+.via{flex:1;display:flex;align-items:center;gap:10px;padding:10px 11px;text-align:left;
+  border:1px solid var(--line);border-radius:var(--r);background:var(--panel);color:var(--ink);
+  transition:border-color .16s,background .16s,color .16s}
+.via:hover{border-color:var(--line-2)}
+.via .vico{flex:none;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;
+  font-size:14px;background:var(--sunk);color:var(--ink-2)}
+.via .vtx{min-width:0}
+.via .vtx b{display:block;font-size:13.5px;font-weight:600;line-height:1.2}
+.via .vtx small{display:block;font-size:11px;color:var(--muted);margin-top:1px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.via.on{border-color:var(--accent);background:var(--accent-soft)}
+.via.on .vico{background:var(--accent);color:var(--accent-ink)}
+.via.on .vtx small{color:var(--ink-2)}
+
 .sum{display:flex;gap:2px;margin:13px 0 4px;border:1px solid var(--line);border-radius:var(--r);
   overflow:hidden;background:var(--line)}
 .sum div{flex:1;background:var(--panel);padding:10px 11px}
@@ -518,7 +535,9 @@ const I18N={hu:{
   route:"Útvonal", room:"Helyiség", lvl:"Szint",
   go:"Indulj innen:", arrive:"Cél:", walk:"Haladj tovább", left:"Fordulj balra", right:"Fordulj jobbra",
   stairs:"Lépcsőn", up:"fel", down:"le", to:"a(z) %s szintre", via:"Lépcsőház",
-  lift:"Lépcsőmentes útvonal: a tervlapon nincs jelölt lift, ezért egyelőre nem tervezhető.",
+  byLift:"Lifttel", liftVia:"Lift", optStairs:"Lépcső", optLift:"Lift",
+  viaLabel:"Szintváltás", noLiftHere:"Ehhez az útvonalhoz nincs liftes alternatíva: a hallgatói lift az FL3 magban van, ami a tervlap szerint erről a szintről gyalog nem érhető el.",
+  lift:"A hallgatók az épületben csak az FL3 lépcsőmagban lévő liftet használhatják, ezért az alternatív útvonal ezen keresztül vezet.",
   foot:"Az alaprajzokból gépi úton előállított adat. Tájékoztató jellegű.",
   qwc:"Legközelebbi mosdó", qbufe:"Büfé", qentry:"Főbejárat · előtér",
   qsub:"innen: %s", qsub0:"a földszinti előtértől", legend2:"Funkció szerinti színek"
@@ -534,7 +553,9 @@ const I18N={hu:{
   route:"Route", room:"Room", lvl:"Level",
   go:"Start at:", arrive:"Destination:", walk:"Continue", left:"Turn left", right:"Turn right",
   stairs:"Take the stairs", up:"up", down:"down", to:"to %s", via:"Stairwell",
-  lift:"Step-free routing is unavailable: no lift is marked on the source plan.",
+  byLift:"Take the lift", liftVia:"Lift", optStairs:"Stairs", optLift:"Lift",
+  viaLabel:"Between levels", noLiftHere:"No lift alternative for this route: the student lift sits in the FL3 core, which the source plan leaves unreachable on foot from this level.",
+  lift:"Students may only use the lift in the FL3 stair core, so the alternative route goes through it.",
   foot:"Data derived automatically from the architectural plans. For orientation only.",
   qwc:"Nearest toilet", qbufe:"Café", qentry:"Main entrance · lobby",
   qsub:"from %s", qsub0:"from the ground-floor lobby", legend2:"Function colours"
@@ -544,7 +565,8 @@ const I18N={hu:{
    beégetve; most állapot, hogy forgatni lehessen. */
 const ROT0={x:58,z:-30}, TILT_MIN=15, TILT_MAX=85;
 const S={lang:"hu",theme:"auto",mode:2,level:0,from:null,to:null,sel:null,route:null,mm:null,
-         view:{k:1,x:0,y:0},rot:{...ROT0},leg:false};
+         view:{k:1,x:0,y:0},rot:{...ROT0},leg:false,
+         routes:{stairs:null,lift:null},mms:{stairs:null,lift:null},via:"stairs",hasLift:false};
 const T=()=>I18N[S.lang];
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -607,18 +629,46 @@ function nearestCell(lv,x,y){
     const dd=((i+.5)*RES-x)**2+((j+.5)*RES-y)**2;if(dd<bd){bd=dd;best=k;}}
   return bd<49?best:-1;
 }
-const PORTAL=new Map(), STAIRXY={};
+/* A hallgatók által használható lift. A tervlap nem jelöli külön helyiségként
+   (D.lifts üres), ezért az FL3 lépcsőmag pontjain vesszük fel — ez az a mag,
+   amelyik a földszinttől a IV. emeletig végigmegy. Ha a tervlap egyszer
+   megkapja a liftet, ez a lista elhagyható és a D.lifts lép a helyére. */
+const LIFTS = (D.lifts && D.lifts.length) ? D.lifts : [{
+  id:"LIFT1", code:"FL3",
+  pts:[[0,54.67,5.97,"OA00FL3"],[1,54.32,6.11,"OA01FL3"],[2,56.21,5.17,"OA10EL3"],
+       [3,56.21,5.17,"OA20EL3"],[4,56.21,5.17,"OA30EL1"],[5,56.22,5.17,"OA40EL1"]]
+}];
+
+const PORTAL=new Map(), PORTAL_LIFT=new Map(), STAIRXY={};
+const link=(map,A,B,w,meta)=>{
+  if(!map.has(A))map.set(A,[]); if(!map.has(B))map.set(B,[]);
+  map.get(A).push({to:B,w,meta}); map.get(B).push({to:A,w,meta});
+};
+const nodesOf=st=>st.pts.slice().sort((a,b)=>a[0]-b[0])
+  .map(p=>({lv:p[0],c:nearestCell(p[0],p[1],p[2]),code:p[3],x:p[1],y:p[2]}))
+  .filter(p=>p.c>=0);
+
 for(const st of D.stairs){
-  const pts=st.pts.slice().sort((a,b)=>a[0]-b[0])
-    .map(p=>({lv:p[0],c:nearestCell(p[0],p[1],p[2]),code:p[3],x:p[1],y:p[2]})).filter(p=>p.c>=0);
+  const pts=nodesOf(st);
   for(const p of pts) STAIRXY[st.id+"/"+p.lv]=p;
+  // lépcsőnél csak a szomszédos szintek: végig kell menni rajtuk
   for(let i=0;i+1<pts.length;i++){
-    const a=pts[i],b=pts[i+1],A=LVI[a.lv]*CELLS+a.c,B=LVI[b.lv]*CELLS+b.c;
-    const meta={id:st.id,code:a.code};
-    if(!PORTAL.has(A))PORTAL.set(A,[]); if(!PORTAL.has(B))PORTAL.set(B,[]);
-    PORTAL.get(A).push({to:B,w:15,meta}); PORTAL.get(B).push({to:A,w:15,meta});
+    const a=pts[i],b=pts[i+1];
+    link(PORTAL, LVI[a.lv]*CELLS+a.c, LVI[b.lv]*CELLS+b.c, 15, {id:st.id,code:a.code,kind:"stairs"});
   }
 }
+for(const lf of LIFTS){
+  const pts=nodesOf(lf);
+  // A liftnél minden szintpár közvetlen: egy menetben átvisz, nem szintenként.
+  // A súly a hívás/várakozás (25) plusz emeletenként 6 — így egy emeletre a
+  // lépcső marad az olcsóbb, több szintnél a lift.
+  for(let i=0;i<pts.length;i++) for(let j=i+1;j<pts.length;j++){
+    const a=pts[i],b=pts[j], n=Math.abs(LVI[b.lv]-LVI[a.lv]);
+    link(PORTAL_LIFT, LVI[a.lv]*CELLS+a.c, LVI[b.lv]*CELLS+b.c,
+         25+6*n, {id:lf.id,code:lf.code,kind:"lift",levels:n});
+  }
+}
+const LIFT_LEVELS=new Set(LIFTS.flatMap(l=>l.pts.map(p=>p[0])));
 
 /* ------------------------------------------------------------------ útvonal */
 class Heap{constructor(){this.a=[]}
@@ -630,7 +680,8 @@ class Heap{constructor(){this.a=[]}
       if(m===i)break;[a[m],a[i]]=[a[i],a[m]];i=m}}return top}
   get size(){return this.a.length}}
 
-function findRoute(r1,r2){
+function findRoute(r1,r2,portals){
+  portals=portals||PORTAL;
   const s=RCELL[r1.id],t=RCELL[r2.id];
   if(s===undefined||t===undefined)return null;
   const S0=LVI[r1.level]*CELLS+s,T0=LVI[r2.level]*CELLS+t,N=LV.length*CELLS;
@@ -648,7 +699,7 @@ function findRoute(r1,r2){
       const w=RES*(di&&dj?1.4142:1)*(cc<=1?1.6:cc<=2?1.15:1);
       if(c+w<dist[v]){dist[v]=c+w;prev[v]=u;pq.push(c+w,v);}
     }
-    for(const p of (PORTAL.get(u)||[]))
+    for(const p of (portals.get(u)||[]))
       if(c+p.w<dist[p.to]){dist[p.to]=c+p.w;prev[p.to]=u;via[p.to]=p.meta;pq.push(c+p.w,p.to);}
   }
   if(!isFinite(dist[T0]))return null;
@@ -680,7 +731,13 @@ function analyse(rt){
   let d=0;for(const s of segs)for(let i=0;i+1<s.pts.length;i++)
     d+=Math.hypot(s.pts[i+1][0]-s.pts[i][0],s.pts[i+1][1]-s.pts[i][1]);
   const vert=segs.length-1;
-  return {segs,dist:Math.round(d),vert,min:Math.max(1,Math.ceil((d/1.3+vert*22)/60))};
+  // A lift nem szintenként telik: hívás/várakozás plusz a menet.
+  let vsec=0;
+  for(let i=0;i+1<segs.length;i++){
+    const v=segs[i+1].vias[0]||segs[i].vias[segs[i].vias.length-1];
+    vsec += (v&&v.kind==="lift") ? 35+8*(v.levels||1) : 22;
+  }
+  return {segs,dist:Math.round(d),vert,min:Math.max(1,Math.ceil((d/1.3+vsec)/60))};
 }
 function steps(rt,mm){
   const t=T(),o=[];
@@ -703,9 +760,10 @@ function steps(rt,mm){
     const nx=mm.segs[si+1];
     if(nx){
       const v=(nx.vias[0]||s.vias[s.vias.length-1]);
-      o.push({ico:"⌁",v:true,lv:nx.lv,
-        t:`${t.stairs} ${nx.lv>s.lv?t.up:t.down} ${t.to.replace("%s",lvName(nx.lv).toLowerCase())}`,
-        d:v?`${t.via} · ${v.code}`:""});
+      const isLift=!!(v&&v.kind==="lift");
+      o.push({ico:isLift?"⇅":"⌁",v:true,lv:nx.lv,
+        t:`${isLift?t.byLift:t.stairs} ${nx.lv>s.lv?t.up:t.down} ${t.to.replace("%s",lvName(nx.lv).toLowerCase())}`,
+        d:v?`${isLift?t.liftVia:t.via} · ${v.code}`:""});
     }
   });
   o.push({ico:"◆",t:t.arrive,d:`${rt.b.code} · ${rt.b.name||rt.b.cat}`,lv:rt.b.level});
@@ -1118,6 +1176,17 @@ function renderPanel(){
     if(S.from&&S.to&&!S.route) h+=`<p class="note">${t.none}</p>`;
     else if(S.route){
       const mm=S.mm,st=steps(S.route,mm);
+      if(S.hasLift){
+        const opt=(key,ico,label)=>{
+          const m=S.mms[key]; if(!m) return "";
+          return `<button class="via${S.via===key?" on":""}" data-via="${key}">
+            <span class="vico">${ico}</span>
+            <span class="vtx"><b>${label}</b>
+              <small class="mono">${m.dist} ${t.m} · ${m.min} ${t.min}</small></span></button>`;
+        };
+        h+=`<div class="eyebrow sub">${t.viaLabel}</div>
+            <div class="viasw">${opt("stairs","⌁",t.optStairs)}${opt("lift","⇅",t.optLift)}</div>`;
+      }
       h+=`<div class="sum">
         <div><b class="mono">${mm.dist}</b><i>${t.m}</i><small>${t.dist}</small></div>
         <div><b class="mono">${mm.min}</b><i>${t.min}</i><small>${t.time}</small></div>
@@ -1125,7 +1194,7 @@ function renderPanel(){
         <ol class="steps">${st.map((x,i)=>`<li><button class="step ${x.v?"v":""}" data-s="${i}">
           <span class="ico">${x.ico}</span><span class="b"><span class="t">${esc(x.t)}</span>
           ${x.d?`<span class="d">${esc(x.d)}</span>`:""}</span></button></li>`).join("")}</ol>
-        <p class="note">${t.lift}</p>`;
+        ${mm.vert?`<p class="note">${S.hasLift?t.lift:t.noLiftHere}</p>`:""}`;
       window.__steps=st;
     } else h+=`<p class="note" style="border:0;padding-top:8px">${t.hint2}</p>`;
     h+=`</div>`;
@@ -1156,6 +1225,7 @@ function renderPanel(){
   const bF=$("bF"),bT=$("bT");
   if(bF)bF.onclick=()=>{S.from=S.sel;recompute();};
   if(bT)bT.onclick=()=>{S.to=S.sel;recompute();};
+  box.querySelectorAll("[data-via]").forEach(b=>b.onclick=()=>setVia(b.dataset.via));
   box.querySelectorAll("[data-ep]").forEach(b=>b.onclick=e=>{
     if(e.target.dataset.clear){S[e.target.dataset.clear]=null;recompute();return;}
     const c=S[b.dataset.ep];if(c)select(c);});
@@ -1225,9 +1295,27 @@ function select(code){
   document.querySelectorAll(".res-item").forEach(b=>
     b.setAttribute("aria-selected",b.dataset.code===code));
 }
+function applyVia(){
+  S.route=S.routes[S.via]||S.routes.stairs;
+  S.mm  =S.mms[S.via]   ||S.mms.stairs;
+}
+function setVia(v){
+  if(v===S.via||!S.routes[v])return;
+  S.via=v; applyVia();
+  drawRoute(); renderRail(); renderPanel();
+  if(S.mm&&!S.mm.segs.some(x=>x.lv===S.level)){S.level=S.mm.segs[0].lv;renderRail();}
+  updateView();
+}
 function recompute(){
-  S.route=(S.from&&S.to&&S.from!==S.to)?findRoute(ROOM[S.from],ROOM[S.to]):null;
-  S.mm=S.route?analyse(S.route):null;
+  const pair=S.from&&S.to&&S.from!==S.to;
+  const a=pair?ROOM[S.from]:null, b=pair?ROOM[S.to]:null;
+  S.routes={stairs:pair?findRoute(a,b,PORTAL):null, lift:pair?findRoute(a,b,PORTAL_LIFT):null};
+  S.mms   ={stairs:S.routes.stairs?analyse(S.routes.stairs):null,
+            lift:  S.routes.lift  ?analyse(S.routes.lift  ):null};
+  // A liftet csak akkor kínáljuk fel, ha tényleg szintet vált vele.
+  S.hasLift=!!(S.routes.lift&&S.mms.lift&&S.mms.lift.vert>0);
+  S.via="stairs";                       // a lépcső az alapértelmezés
+  applyVia();
   $("q").value="";
   drawRoute(); renderRail(); renderPanel();
   if(S.mm&&!S.mm.segs.some(s=>s.lv===S.level)){S.level=S.mm.segs[0].lv;renderRail();}
