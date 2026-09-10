@@ -33,6 +33,11 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      # Ha egy futás a deploy lépésnél bukik el (pl. az OIDC token időtúllépése),
+      # NE a hibás jobot indítsd újra: a feltöltés már lefutott, és a második
+      # próbálkozás egy második "github-pages" artifactot hagy, amitől a deploy
+      # elutasítja a futást. Helyette a teljes workflow-t futtasd újra, vagy
+      # indítsd kézzel (Run workflow) — az saját artifactot kap.
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
